@@ -2,70 +2,91 @@
 
 <h1>Starfinder 2e Stylish Action HUD Integration</h1>
 
-**Melhoria de interface para o Token Action HUD no Starfinder 2e. Otimizado para visualização de ações, magias e equipamentos em cenários de alta tecnologia.**
+<p><strong>Melhoria de interface para o Stylish Action HUD no Starfinder 2e</strong></p>
+
+<p>
+Otimizado para visualização de ações, magias e equipamentos em cenários de alta tecnologia.
+</p>
 
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Foundry%20VTT-v12%20%2F%20v13-red?style=for-the-badge" alt="Foundry VTT Version">
-  <img src="https://img.shields.io/badge/Starfinder%202e-v0.0.11-orange?style=for-the-badge" alt="SF2e System Version">
-  <a href="LICENSE.md">
-    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
-  </a>
+  <img src="https://img.shields.io/badge/Foundry%20VTT-v12%20%2F%20v13-red?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Starfinder%202e-v0.0.11-orange?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Licença-MIT-green?style=for-the-badge">
 </p>
 
+---
+
 <div align="center">
-*Interface adaptada para a complexidade tática do Starfinder 2e.* *Originalmente criado para a versão **v0.0.8** | Testado e Validado na versão **v0.0.11** do sistema SF2e.*
+<em>Interface adaptada para a complexidade tática do Starfinder 2e.</em><br>
+<em>Originalmente criado para v0.0.8 | Testado e validado em v0.0.11</em>
 </div>
 
 ---
 
-## 💎 Credits & Acknowledgments / Créditos
-Este módulo é uma extensão e integração baseada no excelente trabalho de **Glitchsmith**.
+## ✨ Funcionalidades
 
-* **Original Module:** [Stylish Action HUD](https://github.com/glitchsmith/stylish-action-hud) by [Glitchsmith](https://www.patreon.com/c/glitchsmith).
-* **Concept:** Baseado no design estético e funcional criado por Glitchsmith.
-
----
-
-Este módulo adapta o **Stylish Action HUD** para as necessidades específicas do **Starfinder 2nd Edition**, garantindo que a vasta lista de ações, perícias e magias do sistema (baseados no motor de Pathfinder 2e) caibam perfeitamente na sua tela.
-
----
-
-## 📋 Table of Contents
-- 🇬🇧 English
-  - 🌟 Key Features
-  - 🛠️ Requirements
-  - 🚀 Installation
-- 🇧🇷 Português
-  - 🌟 Principais Funcionalidades
-  - 🛠️ Requisitos
-  - 🚀 Instalação
-- 🤝 Support & Contributing
-- 📜 License
+- 🔗 Otimizado para combate tático de alta tecnologia (SF2e / PF2e)  
+- ⚡ HUD automático com ações, perícias, magias e equipamentos  
+- 🧼 Interface limpa e organizada  
+- 📏 Submenus ajustados para nomes longos  
+- 🚀 Plug and play (sem configuração)  
+- 🧩 Compatível com Foundry VTT V12 e V13  
 
 ---
 
-## 🇬🇧 English
+## 📦 Requisitos
 
-### 🌟 Key Features
+- Sistema: Starfinder 2nd Edition (v0.0.11)  
+- Módulo:
+  - Stylish Action HUD  
 
-- **Starfinder 2e Optimized**: Tailored for the high-tech tactical combat of SF2e (PF2e engine).
-- **Automated Action HUD**: Automatically populates the Stylish Action HUD with all your character's actions, including Skills, Spells, Weapons, and Augmentations.
-- **Clean & Organized UI**:
-  - Simplified and clear labels for all actions.
-  - Optimized submenu width for long PF2e/SF2e action names.
-- **Plug and Play**: No configuration needed. Just install and activate the module alongside its dependencies.
-- **Foundry V12/V13 Ready**: Built and tested for the latest stable Foundry VTT versions.
+---
 
-### 🛠️ Requirements
+## 🚀 Instalação
 
-This module requires the following to be installed and active:
-- **System**: Starfinder 2nd Edition (Tested on **v0.0.11**; Legacy support since **v0.0.8**)
-- **Module**: [Stylish Action HUD](https://github.com/glitchsmith/stylish-action-hud)
+1. Abra o Foundry VTT  
+2. Vá em **Add-on Modules**  
+3. Clique em **Install Module**  
+4. Cole a URL:
+https://github.com/CalielBR/sf2e-stylish-action-hud/releases/latest/download/module.json
 
-### 🚀 Installation
 
-1. In Foundry VTT, go to the **Add-on Modules** tab in the Configuration and Setup screen.
-2. Click **Install Module**.
-3. In the "Manifest URL" field, paste the following link:
+---
+
+## 🧠 Como Funciona
+
+Este módulo adapta o Stylish Action HUD para o Starfinder 2e, organizando:
+
+- Ações  
+- Magias  
+- Perícias  
+- Equipamentos  
+
+👉 Tudo otimizado para caber na tela sem poluição visual.
+
+---
+
+## 💎 Créditos
+
+- Stylish Action HUD — Glitchsmith  
+
+---
+
+## 🤝 Suporte
+
+Encontrou um bug ou tem uma ideia?  
+Abra uma issue no GitHub.
+
+---
+
+## 📜 Licença
+
+MIT — veja LICENSE.md
+
+---
+
+<div align="center">
+<strong>Feito com ❤️ por CalielBR</strong>
+</div>
