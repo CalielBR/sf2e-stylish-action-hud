@@ -1,6 +1,6 @@
 {
   "id": "sf2e-stylish-action-hud",
-  "title": "Starfinder2e Stylish Action Hud Integration",
+  "title": "Starfinder 2e Stylish Action HUD Integration",
   "description": "Integration and visual enhancements for the Starfinder 2e Action HUD.",
   "version": "1.0.0",
   "authors": [
@@ -10,11 +10,16 @@
     }
   ],
   "compatibility": {
-    "minimum": "13",
-    "verified": "14"
+    "minimum": "12",
+    "verified": "13",
+    "maximum": "14"
   },
   "relationships": {
     "requires": [
+      {
+        "id": "sf2e",
+        "type": "system"
+      },
       {
         "id": "stylish-action-hud",
         "type": "module"
