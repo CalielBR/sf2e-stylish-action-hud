@@ -16,7 +16,7 @@
   "relationships": {
     "requires": [
       {
-        "id": "pf2e-action-hud",
+        "id": "stylish-action-hud",
         "type": "module"
       }
     ]
