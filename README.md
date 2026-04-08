@@ -66,7 +66,7 @@ Este módulo adapta o Stylish Action HUD para o Starfinder 2e, organizando:
 
 ## 💎 Créditos
 
-- Stylish Action HUD — Glitchsmith  
+- Stylish Action HUD — Glitchsmith [[patreon.com/glitchsmith](https://www.patreon.com/cw/glitchsmith)]
 
 ---
 
