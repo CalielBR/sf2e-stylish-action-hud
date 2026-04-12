@@ -191,7 +191,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 				label: "AC",
 				color: "#ffffff",
 				style: "badge",
-				icon: "fas fa-shield-halved",
+				icon: "ra ra-shield",
 				textColor: "#000000",
 				textStrokeColor: "#ffffff",
 				badgeScale: 1.0,
@@ -201,7 +201,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 				label: "Speed",
 				color: "#ffffff",
 				style: "badge",
-				icon: "fas fa-running",
+				icon: "ra ra-running",
 				textColor: "#000000",
 				textStrokeColor: "#ffffff",
 				badgeScale: 1.0,
@@ -211,7 +211,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 				label: "Hero",
 				color: "#ffffff",
 				style: "badge",
-				icon: "fas fa-star",
+				icon: "ra ra-sun-symbol",
 				textColor: "#000000",
 				textStrokeColor: "#ffffff",
 				badgeScale: 1.0,
@@ -345,7 +345,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 						path: `spellcasting.${entry.id}.dc`,
 						label: `${shortName} DC`,
 						style: "badge",
-						icon: "fas fa-bullseye",
+						icon: "ra ra-target-arrows",
 						color: "#9966ff",
 						textColor: "#ffffff",
 						textStrokeColor: "#000000",
@@ -419,43 +419,43 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		return [
 			{
 				systemId: "strike",
-				label: game.i18n.localize("IBHUD.Category.Strike"),
-				icon: "fas fa-gavel",
+				label: `${game.i18n.localize("IBHUD.Category.Strike")} <i class="ra ra-fist-raised" style="margin-left: 10px;"></i>`,
+				icon: "",
 				type: "submenu",
 				useSidebar: false,
 			},
 			{
 				systemId: "spell",
-				label: game.i18n.localize("IBHUD.Category.Spells"),
-				icon: "fas fa-book-dead",
+				label: `${game.i18n.localize("IBHUD.Category.Spells")} <i class="ra ra-bleeding-eye" style="margin-left: 10px;"></i>`,
+				icon: "",
 				type: "submenu",
 				useSidebar: true,
 			},
 			{
 				systemId: "action",
-				label: game.i18n.localize("IBHUD.Category.Actions"),
-				icon: "fas fa-running",
+				label: `${game.i18n.localize("IBHUD.Category.Actions")} <i class="ra ra-aware" style="margin-left: 10px;"></i>`,
+				icon: "",
 				type: "submenu",
 				useSidebar: true,
 			},
 			{
 				systemId: "feat",
-				label: game.i18n.localize("IBHUD.Category.Feats"),
-				icon: "fas fa-medal",
+				label: `${game.i18n.localize("IBHUD.Category.Feats")} <i class="ra ra-medal" style="margin-left: 10px;"></i>`,
+				icon: "",
 				type: "submenu",
 				useSidebar: true,
 			},
 			{
 				systemId: "utility",
-				label: game.i18n.localize("IBHUD.Category.Utility"),
-				icon: "fas fa-dice-d20",
+				label: `${game.i18n.localize("IBHUD.Category.Utility")} <i class="ra ra-gear-hammer" style="margin-left: 10px;"></i>`,
+				icon: "",
 				type: "submenu",
 				useSidebar: true,
 			},
 			{
 				systemId: "inventory",
-				label: game.i18n.localize("IBHUD.Category.Inventory"),
-				icon: "fas fa-box-open",
+				label: `${game.i18n.localize("IBHUD.Category.Inventory")} <i class="ra ra-triforce" style="margin-left: 10px;"></i>`,
+				icon: "",
 				type: "submenu",
 				useSidebar: true,
 			},
@@ -486,7 +486,10 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 	   ----------------------------------------- */
 	_getStrikeData(actor) {
 		const allActions = actor.system.actions || [];
-		const strikes = allActions.filter((a) => a.item?.isEquipped);
+		// Inclui armas que não estão na mão (sheathed/dropped) para permitir a ação de Draw no HUD
+		const strikes = allActions.filter((a) =>
+			!a.item || a.item.system?.equipped?.carryType !== "stowed"
+		);
 
 		const items = [];
 
@@ -620,67 +623,105 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 	}
 
 	_createStrikeItem(s) {
+		// Define se o item está pronto para uso imediato (ataques desarmados ou itens nas mãos)
+		const isUnarmed = s.item?.type === "unarmed" || s.traits?.some(t => t.value === "unarmed");
+		const isHeld = s.item?.system?.equipped?.carryType === "held";
+		const isReady = isHeld || isUnarmed;
+
 		// [A-0] 탄약 행 HTML 생성
 		const ammoHtml = this._buildAmmoRowHtml(s);
 
+		// Traits da Arma
+		let traitsHtml = "";
+		if (s.traits?.length > 0) {
+			traitsHtml = `<div style="display:flex; gap:2px; flex-wrap:wrap; margin-top:2px;">`;
+			s.traits.forEach(t => {
+				traitsHtml += `<span style="font-size:0.65em; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:2px; padding:0 3px; color:#999; line-height:1.2;" title="${t.description || ''}">${t.label}</span>`;
+			});
+			traitsHtml += `</div>`;
+		}
+
+		// Ações Auxiliares (Grip, Sheathe, etc)
+		let auxHtml = "";
+		if (s.auxiliaryActions?.length > 0) {
+			auxHtml = `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:2px;">`;
+			s.auxiliaryActions.forEach((aux, idx) => {
+				const glyph = this._getActionGlyph(aux.actionCost || 1);
+				auxHtml += `
+					<button type="button"
+						onclick="event.stopPropagation(); StylishAction.useItem('${s.item.id}_auxiliary_${idx}')"
+						title="${aux.label}"
+						style="background:rgba(40, 60, 80, 0.6); border:1px solid #468; color:#adf; border-radius:3px; padding:1px 5px; font-size:0.75em; cursor:pointer; line-height:1.1; display:flex; align-items:center; gap:2px;"
+						onmouseover="this.style.background='#468'; this.style.color='#fff';"
+						onmouseout="this.style.background='rgba(40, 60, 80, 0.6)'; this.style.color='#adf';">
+						${glyph} <span style="font-family:'Oswald',sans-serif;">${aux.label}</span>
+					</button>`;
+			});
+			auxHtml += `</div>`;
+		}
+
 		// [A] 주 액션 버튼 그룹 HTML 생성
-		let buttonsHtml = `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:2px;">`;
+		let buttonsHtml = "";
+		if (isReady) {
+			buttonsHtml = `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:2px;">`;
 
-		// 1. 공격 버튼들 (Variants)
-		s.variants.forEach((v, idx) => {
-			const opacity = idx === 0 ? "1.0" : idx === 1 ? "0.8" : "0.6";
+			// 1. 공격 버튼들 (Variants)
+			s.variants.forEach((v, idx) => {
+				const opacity = idx === 0 ? "1.0" : idx === 1 ? "0.8" : "0.6";
 
+				buttonsHtml += `
+						<button 
+							type="button"
+							class="pf2e-map-btn"
+							onclick="event.stopPropagation(); StylishAction.useItem('${s.item.id}_attack_${idx}')"
+							title="${idx === 0 ? "1st Attack" : idx === 1 ? "2nd Attack (MAP)" : "3rd Attack (MAP)"}"
+							style="
+								background: rgba(50, 50, 50, ${opacity}); 
+								border: 1px solid #666; 
+								color: #eee; 
+								border-radius: 3px; 
+								padding: 1px 6px; 
+								font-size: 0.85em; 
+								font-family: 'Oswald', sans-serif;
+								cursor: pointer;
+								line-height: 1.2;
+								min-width: 30px;
+								text-align: center;
+							"
+							onmouseover="this.style.background='#eee'; this.style.color='#000';"
+							onmouseout="this.style.background='rgba(50, 50, 50, ${opacity})'; this.style.color='#eee';"
+						>
+							${v.label}
+						</button>
+					`;
+			});
+
+			// 2. 데미지 버튼
 			buttonsHtml += `
-                    <button 
-                        type="button"
-                        class="pf2e-map-btn"
-                        onclick="event.stopPropagation(); StylishAction.useItem('${s.item.id}_attack_${idx}')"
-                        title="${idx === 0 ? "1st Attack" : idx === 1 ? "2nd Attack (MAP)" : "3rd Attack (MAP)"}"
-                        style="
-                            background: rgba(50, 50, 50, ${opacity}); 
-                            border: 1px solid #666; 
-                            color: #eee; 
-                            border-radius: 3px; 
-                            padding: 1px 6px; 
-                            font-size: 0.85em; 
-                            font-family: 'Oswald', sans-serif;
-                            cursor: pointer;
-                            line-height: 1.2;
-                            min-width: 30px;
-                            text-align: center;
-                        "
-                        onmouseover="this.style.background='#eee'; this.style.color='#000';"
-                        onmouseout="this.style.background='rgba(50, 50, 50, ${opacity})'; this.style.color='#eee';"
-                    >
-                        ${v.label}
-                    </button>
-                `;
-		});
-
-		// 2. 데미지 버튼
-		buttonsHtml += `
-                <button 
-                    type="button"
-                    class="pf2e-dmg-btn"
-                    onclick="event.stopPropagation(); StylishAction.useItem('${s.item.id}_damage')"
-                    title="Click: Damage / Ctrl+Click: Critical"
-                    style="
-                        background: rgba(100, 20, 20, 0.8); 
-                        border: 1px solid #d44; 
-                        color: #faa; 
-                        border-radius: 3px; 
-                        padding: 1px 6px; 
-                        font-size: 0.85em; 
-                        cursor: pointer;
-                        line-height: 1.2;
-                        margin-left: 2px;
-                    "
-                    onmouseover="this.style.background='#d44'; this.style.color='#fff';"
-                    onmouseout="this.style.background='rgba(100, 20, 20, 0.8)'; this.style.color='#faa';"
-                >
-                    <i class="ra ra-perspective-dice-six"></i>
-                </button>
-            </div>`;
+					<button 
+						type="button"
+						class="pf2e-dmg-btn"
+						onclick="event.stopPropagation(); StylishAction.useItem('${s.item.id}_damage')"
+						title="Click: Damage / Ctrl+Click: Critical"
+						style="
+							background: rgba(100, 20, 20, 0.8); 
+							border: 1px solid #d44; 
+							color: #faa; 
+							border-radius: 3px; 
+							padding: 1px 6px; 
+							font-size: 0.85em; 
+							cursor: pointer;
+							line-height: 1.2;
+							margin-left: 2px;
+						"
+						onmouseover="this.style.background='#d44'; this.style.color='#fff';"
+						onmouseout="this.style.background='rgba(100, 20, 20, 0.8)'; this.style.color='#faa';"
+					>
+						<i class="ra ra-dripping-blade"></i>
+						<i class="ra ra-dice-six"></i>
+					</button>
+				</div>`;
+		}
 
 		// [A-2] altUsages가 있는 경우 (예: area-fire 무기에 일반 strike 대안이 있는 경우)
 		let altButtonsHtml = "";
@@ -711,21 +752,28 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 							line-height: 1.2; margin-left: 2px;"
 						onmouseover="this.style.background='#d44'; this.style.color='#fff';"
 						onmouseout="this.style.background='rgba(100, 20, 20, 0.8)'; this.style.color='#faa';">
-						<i class="ra ra-fire-bomb"></i>
-						<i class="ra ra-perspective-dice-six"></i>
+						<i class="ra ra-dripping-blade"></i>
+						<i class="ra ra-dice-six"></i>
 					</button>
 				</div>`;
 			});
 		}
 
+		// Aplica opacidade e rótulo de "Unequipped" se o item não estiver na mão
+		const mainOpacity = isReady ? "1.0" : "0.55";
+		const unequippedLabel = !isReady ? `<span style="font-size:0.8em; color:#aaa; font-style:italic; margin-left:5px;">(${game.i18n.localize("IBHUD.Pf2e.ActionUnequipped") || "Unequipped"})</span>` : "";
+
 		// [B] 2단 레이아웃 구성 (이름 + 버튼들)
 		const layoutHtml = `
-                <div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center;">
-                    <span style="font-size:1.05em; font-weight:bold; color:#fff; line-height:1.2;">
+                <div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; opacity:${mainOpacity};">
+                    <span style="font-size:1.05em; font-weight:bold; color:#fff; line-height:1.2; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
                         ${s.label}
+						${unequippedLabel}
                     </span>
+					${traitsHtml}
                     ${ammoHtml}
                     ${buttonsHtml}
+					${auxHtml}
                     ${altButtonsHtml}
                 </div>
             `;
@@ -733,7 +781,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		return {
 			id: s.item.id,
 			name: layoutHtml,
-			img: s.imageUrl || s.item.img || "icons/svg/book.svg",
+			img: s.imageUrl || s.item?.img || "icons/svg/d20.svg",
 			cost: "",
 			description: s.description || s.damageLabel || "Strike",
 		};
@@ -743,7 +791,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		const element = config.element;
 		const damageTypes = config.damageTypes || [];
 		const label = `Elemental Blast (${element})`;
-		const img = elementalBlast.item?.img || "icons/svg/book.svg";
+		const img = elementalBlast.item?.img || "icons/svg/fire.svg";
 
 		let buttonsHtml = `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:2px;">`;
 
@@ -778,8 +826,8 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 					line-height: 1.2; margin-left: 2px;"
 				onmouseover="this.style.background='#d44'; this.style.color='#fff';"
 				onmouseout="this.style.background='rgba(100, 20, 20, 0.8)'; this.style.color='#faa';">
-				<i class="ra ra-fire-bomb"></i>
-				<i class="ra ra-perspective-dice-six"></i>
+				<i class="ra ra-dripping-blade"></i>
+				<i class="ra ra-dice-six"></i>
 			</button>
 		</div>`;
 
@@ -855,8 +903,8 @@ export class Pf2eAdapter extends BaseSystemAdapter {
                     margin-left: 5px;
                 "
             >
-                <i class="ra ra-fire-bomb"></i>
-                <i class="ra ra-perspective-dice-six"></i>
+                <i class="ra ra-dripping-blade"></i>
+                <i class="ra ra-dice-six"></i>
             </button>
         </div>`;
 
@@ -888,7 +936,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 
 				let labelHtml = shortName;
 				if (dc) {
-					labelHtml = `${shortName} <span class="ib-dc-badge">DC ${dc}</span>`;
+					labelHtml = `${shortName} <span class="ib-dc-badge">DC ${dc}</span> <i class='ra ra-crystal-ball' style='margin-left: 8px;'></i>`;
 				}
 
 				primaryLabels[entryId] = labelHtml;
@@ -1055,7 +1103,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 	_makeSpellItem(spell, isExhausted) {
 		const timeValue = spell.system.time?.value;
 		const costGlyph = this._getActionGlyph(timeValue);
-
+		const img = spell.img || "icons/svg/magic.svg";
 		let extraInfo = "";
 		const entryId = spell.system.location?.value;
 		const entry = spell.actor?.spellcasting?.get(entryId);
@@ -1077,7 +1125,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		return {
 			id: spell.id,
 			name: spell.name,
-			img: spell.img || "icons/svg/book.svg",
+			img: img,
 			cost: `
                 <div style="display:flex; align-items:center;">
                     ${costGlyph}
@@ -1139,7 +1187,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		if (game.pf2e?.actions) {
 			game.pf2e.actions.forEach(action => {
 				let name = game.i18n.localize(action.name);
-				
+
 				// Adiciona o nome da perícia se for uma ação vinculada a um teste para clareza (ex: Avoid Notice (Stealth))
 				const traits = action.traits instanceof Set ? Array.from(action.traits) : (action.traits || []);
 				const skillTrait = traits.find(t => skillTraitsList.includes(t.value || t));
@@ -1149,10 +1197,12 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 					name = `${name} (${skillLabel})`;
 				}
 
+				const img = (action.img && action.img !== "icons/svg/mystery-man.svg") ? action.img : "icons/svg/d20.svg";
+
 				const itemData = {
 					id: `skillaction:${action.slug}`,
 					name: name,
-					img: action.img || "icons/svg/book.svg",
+					img: img,
 					cost: this._getActionGlyph(action.cost || action.actionType),
 					description: game.i18n.localize(action.description),
 					isExhausted: false
@@ -1214,10 +1264,11 @@ export class Pf2eAdapter extends BaseSystemAdapter {
                 </div>
             `;
 
+			const img = (i.img && i.img !== "icons/svg/mystery-man.svg") ? i.img : "icons/svg/d20.svg";
 			const itemData = {
 				id: i.id,
 				name: i.name,
-				img: i.img || "icons/svg/book.svg",
+				img: img,
 				cost: finalCost,
 				description: i.system.description.value,
 				isExhausted: isExhausted,
@@ -1262,12 +1313,12 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 			hasSubTabs: true,
 			items: items,
 			tabLabels: {
-				basic: "Basic",
-				skill: "Skill",
-				action: "Actions",
-				reaction: "Reactions",
-				free: "Free",
-				passive: "Passives"
+				basic: "Basic <i class='ra ra-muscle-up' style='margin-left: 8px;'></i>",
+				skill: "Skill <i class='ra ra-dice-six' style='margin-left: 8px;'></i>",
+				action: "Actions <i class='ra ra-hand' style='margin-left: 8px;'></i>",
+				reaction: "Reactions <i class='ra ra-lightning-bolt' style='margin-left: 8px;'></i>",
+				free: "Free <i class='ra ra-fist-raised' style='margin-left: 8px;'></i>",
+				passive: "Passives <i class='ra ra-eye-monster' style='margin-left: 8px;'></i>"
 			},
 			subTabLabels: subLabels
 		};
@@ -1328,10 +1379,11 @@ export class Pf2eAdapter extends BaseSystemAdapter {
                 </div>
             `;
 
+			const img = (i.img && i.img !== "icons/svg/mystery-man.svg") ? i.img : "icons/svg/d20.svg";
 			const itemData = {
 				id: i.id,
 				name: i.name,
-				img: i.img || "icons/svg/book.svg",
+				img: img,
 				cost: finalCost,
 				description: i.system.description.value,
 				isExhausted: isExhausted,
@@ -1370,9 +1422,9 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 			hasSubTabs: true, // 사이드바 보이기
 			items: items,
 			tabLabels: {
-				action: game.i18n.localize("IBHUD.SubCategory.Actions"),
-				reaction: game.i18n.localize("IBHUD.SubCategory.Reactions"),
-				free: game.i18n.localize("IBHUD.SubCategory.Free")
+				action: `${game.i18n.localize("IBHUD.SubCategory.Actions")}`,
+				reaction: `${game.i18n.localize("IBHUD.SubCategory.Reactions")}`,
+				free: `${game.i18n.localize("IBHUD.SubCategory.Free")} `
 			},
 			subTabLabels: subLabels
 		};
@@ -1385,31 +1437,31 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		// 1. 카테고리 정의 (현지화 적용됨)
 		const categories = {
 			weapon: {
-				label: game.i18n.localize("IBHUD.Pf2e.InvWeapons"),
+				label: `${game.i18n.localize("IBHUD.Pf2e.InvWeapons")} <i class='ra ra-crossed-swords' style='margin-left: 8px;'></i>`,
 				tooltip: game.i18n.localize("IBHUD.Pf2e.InvWeapons"),
 			},
 			armor: {
-				label: game.i18n.localize("IBHUD.Pf2e.InvArmor"),
+				label: `${game.i18n.localize("IBHUD.Pf2e.InvArmor")} <i class='ra ra-shield' style='margin-left: 8px;'></i>`,
 				tooltip: game.i18n.localize("IBHUD.Pf2e.InvArmor"),
 			},
 			consumable: {
-				label: game.i18n.localize("IBHUD.Pf2e.InvConsumables"),
+				label: `${game.i18n.localize("IBHUD.Pf2e.InvConsumables")} <i class='ra ra-potion' style='margin-left: 8px;'></i>`,
 				tooltip: game.i18n.localize("IBHUD.Pf2e.InvConsumables"),
 			},
 			equipment: {
-				label: game.i18n.localize("IBHUD.Pf2e.InvEquipment"),
+				label: `${game.i18n.localize("IBHUD.Pf2e.InvEquipment")} <i class='ra ra-gear-hammer' style='margin-left: 8px;'></i>`,
 				tooltip: game.i18n.localize("IBHUD.Pf2e.InvEquipment"),
 			},
 			treasure: {
-				label: game.i18n.localize("IBHUD.Pf2e.InvTreasure"),
+				label: `${game.i18n.localize("IBHUD.Pf2e.InvTreasure")} <i class='ra ra-gem' style='margin-left: 8px;'></i>`,
 				tooltip: game.i18n.localize("IBHUD.Pf2e.InvTreasure"),
 			},
 			backpack: {
-				label: game.i18n.localize("IBHUD.Pf2e.InvContainers"),
+				label: `${game.i18n.localize("IBHUD.Pf2e.InvContainers")} <i class='ra ra-backpack' style='margin-left: 8px;'></i>`,
 				tooltip: game.i18n.localize("IBHUD.Pf2e.InvContainers"),
 			},
 			ammo: {
-				label: "Ammunition",
+				label: `Ammunition <i class='ra ra-bullets' style='margin-left: 8px;'></i>`,
 				tooltip: "Ammunition",
 			},
 		};
@@ -1451,7 +1503,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 			const listItem = {
 				id: i.id,
 				name: i.name,
-				img: i.img || "icons/svg/book.svg",
+				img: i.img || "icons/svg/item-bag.svg",
 				hasInlineControls: Boolean(actionButtons),
 				cost: actionButtons
 					? `
@@ -1515,6 +1567,15 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 
 		const options = [];
 
+		const isHeld = carryType === "held";
+		// Dinamicamente escolhe entre "Draw" ou "Grip" baseado no estado atual
+		const verb = isHeld
+			? (game.i18n.localize("IBHUD.Pf2e.ActionGrip") || "Grip")
+			: (game.i18n.localize("IBHUD.Pf2e.ActionDraw") || "Draw");
+
+		const handsLabel1 = game.i18n.localize("IBHUD.Pf2e.ActionGrip1") || "1H";
+		const handsLabel2 = game.i18n.localize("IBHUD.Pf2e.ActionGrip2") || "2H";
+
 		const addOption = (id, label, iconHtml, active = false) => {
 			options.push({
 				id,
@@ -1527,13 +1588,13 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		if (canGrip) {
 			addOption(
 				"grip1",
-				`${game.i18n.localize("IBHUD.Pf2e.ActionHeld")} ${game.i18n.localize("IBHUD.Pf2e.ActionGrip1")}`,
+				`${verb} ${handsLabel1}`,
 				this._getInventoryCarryIconHtml("held", 1),
 				isHeld1,
 			);
 			addOption(
 				"grip2",
-				`${game.i18n.localize("IBHUD.Pf2e.ActionHeld")} ${game.i18n.localize("IBHUD.Pf2e.ActionGrip2")}`,
+				`${verb} ${handsLabel2}`,
 				this._getInventoryCarryIconHtml("held", 2),
 				isHeld2,
 			);
@@ -1680,14 +1741,21 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 
 		// 1. 내성 굴림 (Saves)
 		if (actor.saves) {
+			const saveIcons = {
+				fortitude: "ra ra-ankh",
+				reflex: "ra ra-cat",
+				will: "ra ra-brain-freeze"
+			};
 			["fortitude", "reflex", "will"].forEach((saveKey) => {
 				const save = actor.saves[saveKey];
 				if (save) {
 					const mod = save.mod ?? save.totalModifier ?? save.value ?? 0;
+					const raClass = saveIcons[saveKey];
+					const iconHtml = raClass ? `<i class="${raClass}" style="margin-right: 12px; font-size:1.1em; vertical-align:middle; width:20px; text-align:center;"></i>` : "";
 					items["save"]["all"].push({
 						id: `save-${saveKey}`,
-						name: save.label || saveKey.toUpperCase(),
-						img: "icons/svg/shield.svg",
+						name: `<span style="display: flex; align-items: center;">${iconHtml}${save.label || saveKey.toUpperCase()}</span>`,
+						img: "",
 						cost: `${mod >= 0 ? "+" : ""}${mod}`,
 						description: `Roll ${save.label} Save`,
 					});
@@ -1749,15 +1817,6 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 				description: "Roll Initiative",
 			});
 		}
-
-		// (C) Rest for the Night
-		items["other"]["all"].push({
-			id: "rest-night",
-			name: "Rest for the Night",
-			img: "icons/svg/sleep.svg",
-			cost: "8h",
-			description: "Recover HP, Spells, Dailies",
-		});
 
 		// (D) Roll Option Toggles
 		const toggleData = this._getToggles(actor);
@@ -1822,11 +1881,11 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 			tabLabels: primaryLabels,
 			tabTooltips: primaryTooltips,
 			subTabLabels: {
-				save: { all: "Saving Throws" },
-				skill: { all: "Skills & Lore" },
-				toggle: { all: "Roll Options" },
-				other: { all: "Misc & Rest" },
-				macro: { all: "Custom Macros" },
+				save: { all: `Saving Throws <i class='ra ra-shield' style='margin-left: 8px;'></i>` },
+				skill: { all: `Skills & Lore <i class='ra ra-dice-six' style='margin-left: 8px;'></i>` },
+				toggle: { all: `Roll Options <i class='ra ra-cog' style='margin-left: 8px;'></i>` },
+				other: { all: `Misc & Rest <i class='ra ra-sleep' style='margin-left: 8px;'></i>` },
+				macro: { all: `Custom Macros <i class='ra ra-gear-hammer' style='margin-left: 8px;'></i>` },
 			},
 		};
 	}
@@ -1854,9 +1913,17 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 		}
 
 		if (itemId.startsWith("skillaction:")) {
-			const slug = itemId.replace("skillaction:", "");
+			const parts = itemId.split(":");
+			const slug = parts[1];
+			const variantIdx = parts[2];
 			const action = game.pf2e.actions.get(slug);
-			return action?.use({ event: cleanEvent, actors: [actor] });
+
+			const options = { event: cleanEvent, actors: [actor] };
+			if (variantIdx !== undefined && ['trip', 'grapple', 'shove', 'reposition', 'disarm', 'force-open'].includes(slug)) {
+				options.mapIncreases = parseInt(variantIdx);
+			}
+
+			return action?.use(options);
 		}
 
 		if (this._isInventoryControlAction(itemId)) {
@@ -1911,6 +1978,10 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 				if (altUsage) {
 					return this._handleStrike(altUsage, command === "altattack" ? "attack" : "damage", subIdx, cleanEvent);
 				}
+			}
+			if (command === "auxiliary") {
+				const auxIdx = variantIndex;
+				return strike.auxiliaryActions?.[auxIdx]?.execute();
 			}
 			return this._handleStrike(strike, command, variantIndex, cleanEvent);
 		}
@@ -2500,9 +2571,10 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 			return { img: "icons/svg/sleep.svg", name: "Rest for the Night" };
 		}
 		if (itemId.startsWith("skillaction:")) {
-			const slug = itemId.replace("skillaction:", "");
-			const action = game.pf2e.actions.get(slug);
-			if (!action) return { img: "icons/svg/bolt.svg", name: slug };
+			const parts = itemId.split(":");
+			const slug = parts[1];
+			const action = game.pf2e?.actions?.get?.(slug);
+			if (!action) return { img: "icons/svg/combat.svg", name: slug };
 
 			let name = game.i18n.localize(action.name);
 			const skillTraits = ['acrobatics', 'arcana', 'athletics', 'crafting', 'deception', 'diplomacy', 'intimidation', 'medicine', 'nature', 'occultism', 'performance', 'religion', 'society', 'stealth', 'survival', 'thievery'];
@@ -2512,7 +2584,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
 				const skillLabel = game.i18n.localize(`PF2E.Skill${traitKey.charAt(0).toUpperCase() + traitKey.slice(1)}`);
 				name = `${name} (${skillLabel})`;
 			}
-			return { img: action.img || "icons/svg/bolt.svg", name: name };
+			return { img: action.img || "icons/svg/d20.svg", name: name };
 		}
 		return null;
 	}
