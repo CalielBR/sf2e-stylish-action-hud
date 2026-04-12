@@ -11,13 +11,130 @@ class Starfinder2eAdapter extends Pf2eAdapter {
         this.systemId = "sf2e";
     }
 
+    /**
+     * Mapeamento centralizado de ícones do RPG Awesome para ações do Starfinder 2e.
+     * Facilita a manutenção e evita duplicidade no código.
+     */
+    static RPG_AWESOME_ICONS = {
+        // --- ENCOUNTER: OFFENSIVE ---
+        'strike': 'ra ra-fist-raised',
+        'disarm': 'ra ra-broken-shield',
+        'grapple': 'ra ra-muscle-up',
+        'shove': 'ra ra-falling',
+        'trip': 'ra ra-bottom-right',
+        'reposition': 'ra ra-player-teleport',
+        'feint': 'ra ra-player-dodge',
+        'escape': 'ra ra-feathered-wing',
+        'area-fire': 'ra ra-small-fire',
+        'auto-fire': 'ra ra-bullets',
+
+        // --- ENCOUNTER: MOVEMENT ---
+        'stride': 'ra ra-shoe-prints',
+        'step': 'ra ra-player',
+        'stand': 'ra ra-aura',
+        'leap': 'ra ra-cat',
+        'crawl': 'ra ra-snail',
+        'fly': 'ra ra-batwings',
+        'burrow': 'ra ra-shovel',
+        'mount': 'ra ra-horseshoe',
+        'push-off': 'ra ra-boot-prints',
+
+        // --- ENCOUNTER: DEFENSE & SUPPORT ---
+        'seek': 'ra ra-eye-monster',
+        'sense-motive': 'ra ra-brain-freeze',
+        'interact': 'ra ra-speech-bubble',
+        'take-cover': 'ra ra-vest',
+        'raise-a-shield': 'ra ra-shield',
+        'avert-gaze': 'ra ra-bleeding-eye',
+        'ready': 'ra ra-hourglass',
+        'delay': 'ra ra-hourglass',
+        'release': 'ra ra-hand',
+        'point-out': 'ra ra-hand-emblem',
+        'dismiss': 'ra ra-cycle',
+        'sustain-a-spell': 'ra ra-clockwise-rotation',
+        'sustain': 'ra ra-tower',
+
+        // --- SKILL ACTIONS (COMBAT & GENERAL) ---
+        'balance': 'ra ra-player',
+        'tumble-through': 'ra ra-player-pain',
+        'maneuver-in-flight': 'ra ra-bird-claw',
+        'climb': 'ra ra-player-lift',
+        'force-open': 'ra ra-double-team',
+        'high-jump': 'ra ra-boot-stomp',
+        'long-jump': 'ra ra-player-thunder-struck',
+        'swim': 'ra ra-anchor',
+        'recall-knowledge': 'ra ra-book',
+        'disable-a-device': 'ra ra-gear-hammer',
+        'create-a-diversion': 'ra ra-bomb-explosion',
+        'demoralize': 'ra ra-player-despair',
+        'administer-first-aid': 'ra ra-health-increase',
+        'treat-poison': 'ra ra-medical-pack',
+        'command-an-animal': 'ra ra-rabbit',
+        'perform': 'ra ra-horn-call',
+        'hide': 'ra ra-uncertainty',
+        'sneak': 'ra ra-shoe-prints',
+        'steal': 'ra ra-hood',
+
+        // --- STARFINDER SPECIALTY ---
+        'drive': 'ra ra-compass',
+        'stop': 'ra ra-interdiction',
+        'stunt': 'ra ra-ship-emblem',
+        'take-control': 'ra ra-hand',
+        'run-over': 'ra ra-player-teleport',
+        'recharge': 'ra ra-battery-100',
+        'access-infosphere': 'ra ra-cog',
+        'hack': 'ra ra-nuclear',
+        'operate-device': 'ra ra-gear-hammer',
+        'livestream': 'ra ra-broadcast',
+
+        // --- EXPLORATION & DOWNTIME ---
+        'analyze-environment': 'ra ra-bird-mask',
+        'avoid-notice': 'ra ra-player-pyromaniac',
+        'defend': 'ra ra-eye-shield',
+        'detect-magic': 'ra ra-crystal-ball',
+        'scout': 'ra ra-eye-monster',
+        'search': 'ra ra-magnifying-glass',
+        'hustle': 'ra ra-running',
+        'follow-the-expert': 'ra ra-archery-target',
+        'repair': 'ra ra-gear-hammer',
+        'craft': 'ra ra-gear-hammer',
+        'earn-income': 'ra ra-gem',
+        'treat-disease': 'ra ra-pill',
+        'subsist': 'ra ra-coffee-mug',
+        'create-forgery': 'ra  ra-forging'
+    };
+
+    /** Lista de perícias padrão para detecção de ícones e rótulos */
+    static SKILL_TRAITS = [
+        'acrobatics', 'arcana', 'athletics', 'computers', 'crafting', 'deception', 'diplomacy',
+        'intimidation', 'medicine', 'nature', 'occultism', 'performance', 'piloting',
+        'religion', 'society', 'stealth', 'survival', 'thievery'
+    ];
+
+    /**
+     * Helper para preparar o visual da ação (nome limpo + ícone único)
+     */
+    _prepareActionDisplay(name, slug, glyph = "") {
+        const cleanName = name.replace(/\s*\(P?S?F2E\.Skill\.[^)]+\)/gi, "");
+        const raClass = Starfinder2eAdapter.RPG_AWESOME_ICONS[slug];
+        const iconHtml = raClass ? `<i class="${raClass}" style="margin-right: 12px; font-size:1.1em; vertical-align:middle; width:20px; text-align:center;"></i>` : "";
+
+        return {
+            hasRaIcon: !!raClass,
+            html: `<div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px;">
+                    <span style="font-size:1.0em; font-weight:bold; line-height:1.2; text-align:left; display: flex; align-items: center;">${iconHtml}${cleanName}</span>
+                    <span style="margin-left:auto; display:flex; align-items:center;">${glyph}</span>
+                   </div>`
+        };
+    }
+
     // Atributos principais na barra do HUD (Party HUD / Player Card)
     getDefaultAttributes() {
         return [
-            { path: "system.attributes.hp", label: "HP", color: "#e61c34", style: "bar", icon: "fas fa-heart" },
-            { path: "system.attributes.sp", label: "SP", color: "#18d4f3", style: "bar", icon: "fas fa-bolt" },
-            { path: "system.attributes.ac.value", label: "AC", color: "#ffffff", style: "badge", icon: "fas fa-shield-halved" },
-            { path: "system.resources.rp", label: "RP", color: "#f1c40f", style: "badge", icon: "fas fa-atom", badgeScale: 1.0 },
+            { path: "system.attributes.hp", label: "HP", color: "#e61c34", style: "bar", icon: "ra ra-health" },
+            { path: "system.attributes.sp", label: "SP", color: "#18d4f3", style: "bar", icon: "ra ra-lightning-bolt" },
+            { path: "system.attributes.ac.value", label: "AC", color: "#ffffff", style: "badge", icon: "ra ra-shield" },
+            { path: "system.resources.rp", label: "RP", color: "#f1c40f", style: "badge", icon: "ra ra-atom", badgeScale: 1.0 },
         ];
     }
 
@@ -29,7 +146,7 @@ class Starfinder2eAdapter extends Pf2eAdapter {
         if (s.attributes?.sp) {
             stats.push({ path: "system.attributes.sp", label: "Stamina Points (SP)" });
         }
-        if (s.resources?.rp) stats.push({ path: "system.resources.rp", label: "Resolve Points (RP)", style: "dots" });
+        if (s.resources?.rp) stats.push({ path: "system.resources.rp", label: "Resolve Points (RP)", style: "badge", icon: "ra ra-atom" });
 
         return stats;
     }
@@ -41,13 +158,16 @@ class Starfinder2eAdapter extends Pf2eAdapter {
     _getUtilityData(actor) {
         // Obtém os dados base (Saves, Skills, Toggles, Other, Macro)
         const data = super._getUtilityData(actor);
+        const assetPath = "modules/sf2e-stylish-action-hud/assets/actions";
 
         // 1. Processamento de Perícias (Skills & Lore)
         if (data.items?.skill) {
-            // Limpa os nomes das perícias padrão (remove o código de tradução bruto)
             if (data.items.skill.all) {
                 data.items.skill.all.forEach(item => {
+                    // Limpa os nomes das perícias padrão
                     if (item.name) item.name = item.name.replace(/\s*\(P?S?F2E\.Skill\.[^)]+\)/gi, "");
+                    // Usa o ícone do sistema ou um fallback seguro do Core Foundry
+                    item.img = item.img || "icons/svg/d20.svg";
                 });
             }
 
@@ -58,7 +178,7 @@ class Starfinder2eAdapter extends Pf2eAdapter {
                 data.items.skill.lore.push({
                     id: `skill-${lore.slug || lore.id}`,
                     name: lore.name,
-                    img: lore.img || "icons/svg/book.svg",
+                    img: lore.img || "icons/svg/d20.svg",
                     cost: `${mod >= 0 ? "+" : ""}${mod}`,
                     description: game.i18n.format("PF2E.SkillCheckWithName", { skillName: lore.name })
                 });
@@ -69,8 +189,8 @@ class Starfinder2eAdapter extends Pf2eAdapter {
                 data.subTabLabels.skill = {};
             }
             data.subTabLabels.skill = {
-                all: game.i18n.localize("PF2E.SkillsLabel") || "Skills",
-                lore: "Lore Skills"
+                all: `${game.i18n.localize("PF2E.SkillsLabel") || "Skills"} <i class='ra ra-dice-six' style='margin-left: 10px;'></i>`,
+                lore: `Lore Skills <i class='ra ra-scroll' style='margin-left: 10px;'></i>`
             };
 
             data.items.skill.lore.sort((a, b) => a.name.localeCompare(b.name));
@@ -80,8 +200,8 @@ class Starfinder2eAdapter extends Pf2eAdapter {
         if (data.items?.other?.all) {
             data.items.other.all.push({
                 id: "sf2e-util:use-resolve",
-                name: "Use Resolve",
-                img: "icons/magic/symbols/star-yellow.webp",
+                name: "Use Resolve Points",
+                img: "icons/svg/d20.svg", // Fallback seguro
                 cost: "RP",
                 description: "Spend Resolve Points for stamina recovery or stabilization."
             });
@@ -91,26 +211,216 @@ class Starfinder2eAdapter extends Pf2eAdapter {
     }
 
     /**
-     * Corrige nomes de ações que mostram chaves de tradução brutas (como PF2E.Skill...)
+     * Corrige nomes de ações e injeta ícones customizados da pasta assets/actions
      */
     _getActionData(actor) {
-        const data = super._getActionData(actor);
+        // Encounter Slugs
+        const slugsAttack = ['strike', 'escape', 'disarm', 'grapple', 'shove', 'trip', 'reposition', 'feint'];
+        const slugsMovement = ['stride', 'step', 'stand', 'crawl', 'leap'];
+        const slugsInteractPercept = ['interact', 'seek', 'sense-motive', 'point-out'];
+        const slugsDefenseSupport = ['take-cover', 'raise-a-shield', 'avert-gaze', 'ready'];
+        const slugsSpecialty = ['area-fire', 'auto-fire', 'burrow', 'fly', 'mount', 'push-off', 'dismiss', 'sustain'];
+        const slugsSkillCombat = [
+            'balance', 'tumble-through', 'maneuver-in-flight', 'climb', 'force-open', 'high-jump', 'long-jump', 'swim',
+            'recall-knowledge', 'disable-a-device', 'create-a-diversion', 'demoralize', 'administer-first-aid',
+            'treat-poison', 'command-an-animal', 'perform', 'hide', 'sneak', 'steal',
+            'drive', 'stop', 'stunt', 'take-control', 'run-over'
+        ];
+        const slugsReactions = ['aid', 'arrest-a-fall', 'grab-an-edge'];
+        const slugsFreeActions = ['delay', 'release'];
 
-        const cleanupNames = (items) => {
-            items.forEach(item => {
-                if (item.name && typeof item.name === 'string') {
-                    // Remove o sufixo de tradução quebrada (ex: "Recall Knowledge (PF2E.Skill.Arcana)")
-                    item.name = item.name.replace(/\s*\(P?S?F2E\.Skill\.[^)]+\)/gi, "");
-                }
-            });
+        // Exploration Slugs
+        const slugsExploration = [
+            'analyze-environment', 'avoid-notice', 'defend', 'detect-magic', 'scout', 'search',
+            'hustle', 'follow-the-expert', 'sustain-an-effect', 'repeat-a-spell',
+            'livestream', 'recharge', 'access-infosphere', 'operative-device', 'hack',
+            'squeeze', 'borrow-an-arcane-spell', 'decipher-writing', 'identify-magic', 'learn-a-spell', 'repair',
+            'impersonate', 'gather-information', 'make-an-impression', 'coerce', 'treat-wounds',
+            'navigate', 'plot-course', 'sense-direction', 'cover-tracks', 'track'
+        ];
+
+        // Downtime Slugs
+        const slugsDowntime = ['craft', 'earn-income', 'treat-disease', 'subsist', 'create-forgery'];
+
+        // Skill Action Mapping logic removed to avoid redundancy
+
+        const seenSlugs = new Set();
+
+        // Buckets temporários para organizar antes de achatar
+        const buckets = {
+            encounter: {
+                attack: [],
+                movement: [],
+                interact_percept: [],
+                defense_support: [],
+                specialty: [],
+                skill_combat: [],
+                reactions: [],
+                free: []
+            },
+            exploration: [],
+            downtime: []
         };
 
-        if (data.items) {
-            if (data.items.basic?.all) cleanupNames(data.items.basic.all);
-            if (data.items.skill?.all) cleanupNames(data.items.skill.all);
+        // 1. System Actions
+        if (game.pf2e?.actions) {
+            game.pf2e.actions.forEach(action => {
+                if (seenSlugs.has(action.slug)) return;
+                seenSlugs.add(action.slug);
+
+                let name = game.i18n.localize(action.name);
+                const traits = action.traits instanceof Set ? Array.from(action.traits) : (action.traits || []);
+                const skillTrait = traits.find(t => Starfinder2eAdapter.SKILL_TRAITS.includes(t.value || t));
+
+                const glyph = this._getActionGlyph(action.cost || action.actionType);
+                const display = this._prepareActionDisplay(name, action.slug, glyph);
+
+                let img = (action.img && !display.hasRaIcon && !action.img.includes("mystery-man")) ? action.img : "";
+                if (!img && !display.hasRaIcon) img = "icons/svg/d20.svg";
+
+                const variants = (['trip', 'force-open', 'grapple', 'reposition', 'shove', 'administer-first-aid'].includes(action.slug))
+                    ? (action.slug === 'administer-first-aid' ? ['STABILIZE', 'STOP BLEEDING'] : (action.slug === 'force-open' ? ['NORMAL', 'MAP -5', 'MAP -10'] : ['NORMAL', 'MAP -4', 'MAP -8']))
+                    : [];
+
+                let finalName = display.html;
+                if (variants.length > 0) {
+                    let buttonsHtml = `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:4px;">`;
+                    variants.forEach((v, idx) => {
+                        buttonsHtml += `
+                            <button type="button" 
+                                onclick="event.stopPropagation(); StylishAction.useItem('skillaction:${action.slug}:${idx}', event)"
+                                style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.2); color:#ccc; border-radius:2px; padding:1px 4px; font-size:0.7em; font-family:'Oswald',sans-serif; cursor:pointer; line-height:1; min-width:24px; text-align:center;"
+                                onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.color='#fff';"
+                                onmouseout="this.style.background='rgba(0,0,0,0.4)'; this.style.color='#ccc';"
+                            >${v}</button>`;
+                    });
+                    buttonsHtml += `</div>`;
+
+                    finalName = `
+                        <div style="display:flex; flex-direction:column; align-items:flex-start; width:100%;">
+                            ${display.html}
+                            ${buttonsHtml}
+                        </div>`;
+                }
+
+                const itemData = {
+                    id: `skillaction:${action.slug}`,
+                    name: finalName,
+                    img: img,
+                    cost: "",
+                    description: game.i18n.localize(action.description)
+                };
+
+                if (slugsAttack.includes(action.slug)) buckets.encounter.attack.push(itemData);
+                else if (slugsMovement.includes(action.slug)) buckets.encounter.movement.push(itemData);
+                else if (slugsInteractPercept.includes(action.slug)) buckets.encounter.interact_percept.push(itemData);
+                else if (slugsDefenseSupport.includes(action.slug)) buckets.encounter.defense_support.push(itemData);
+                else if (slugsSpecialty.includes(action.slug)) buckets.encounter.specialty.push(itemData);
+                else if (slugsSkillCombat.includes(action.slug)) buckets.encounter.skill_combat.push(itemData);
+                else if (slugsReactions.includes(action.slug)) buckets.encounter.reactions.push(itemData);
+                else if (slugsFreeActions.includes(action.slug)) buckets.encounter.free.push(itemData);
+                else if (slugsExploration.includes(action.slug)) buckets.exploration.push(itemData);
+                else if (slugsDowntime.includes(action.slug)) buckets.downtime.push(itemData);
+                else {
+                    // Fallback para não sumir com ações desconhecidas
+                    if (action.actionType === "reaction" || action.actionType === "free") {
+                        buckets.encounter.reactions.push(itemData);
+                    } else {
+                        buckets.encounter.skill_combat.push(itemData);
+                    }
+                }
+            });
         }
 
-        return data;
+        // 2. Actor Actions (Feats/Items)
+        const actorActions = actor.itemTypes.action || [];
+        actorActions.forEach(i => {
+            const actionType = i.system.actionType?.value || "action";
+            const glyph = this._getActionGlyph(i.system.actions?.value || actionType);
+            const slug = i.slug || i.name.slugify();
+            if (seenSlugs.has(slug)) return;
+            seenSlugs.add(slug);
+
+            const display = this._prepareActionDisplay(i.name, slug, glyph);
+
+            let img = (i.img && !display.hasRaIcon && !i.img.includes("mystery-man")) ? i.img : "";
+            if (!img && !display.hasRaIcon) img = "icons/svg/d20.svg";
+
+            const itemData = {
+                id: i.id,
+                name: display.html,
+                img: img,
+                cost: "",
+                description: i.system.description.value
+            };
+
+            if (slugsAttack.includes(slug)) buckets.encounter.attack.push(itemData);
+            else if (slugsMovement.includes(slug)) buckets.encounter.movement.push(itemData);
+            else if (slugsInteractPercept.includes(slug)) buckets.encounter.interact_percept.push(itemData);
+            else if (slugsDefenseSupport.includes(slug)) buckets.encounter.defense_support.push(itemData);
+            else if (slugsSpecialty.includes(slug)) buckets.encounter.specialty.push(itemData);
+            else if (actionType === "reaction" || slugsReactions.includes(slug)) buckets.encounter.reactions.push(itemData);
+            else if (actionType === "free" || slugsFreeActions.includes(slug)) buckets.encounter.free.push(itemData);
+            else if (actionType === "passive") { /* ignore */ }
+            else buckets.encounter.skill_combat.push(itemData);
+        });
+
+        // Flatten Buckets into items array with Headers (The "Submenus")
+        const items = { encounter: [], exploration: [], downtime: [] };
+
+        // Flatten Encounter
+        const encounterLabels = {
+            attack: "Attacks & Maneuvers",
+            movement: "Basic Movement",
+            interact_percept: "Interaction & Perception",
+            defense_support: "Defense & Support",
+            specialty: "Specialized Actions",
+            skill_combat: "Skill Actions (Combat)",
+            reactions: "Reactions",
+            free: "Free Actions"
+        };
+        for (const [key, label] of Object.entries(encounterLabels)) {
+            if (buckets.encounter[key].length > 0) {
+                items.encounter.push({ id: `header-encounter-${key}`, isHeader: true, name: label });
+                items.encounter.push(...buckets.encounter[key].sort((a, b) => a.name.localeCompare(b.name)));
+            }
+        }
+
+        // Add Follow the Expert to Exploration
+        buckets.exploration.unshift({
+            id: "skillaction:follow-the-expert",
+            name: `
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px;">
+                    <span style="font-size:1.0em; font-weight:bold; line-height:1.2; text-align:left; display: flex; align-items: center;"><i class="ra ra-archery-target" style="margin-right:12px; font-size:1.1em; vertical-align:middle; width:20px; text-align:center;"></i>Follow the Expert</span>
+                    <span style="margin-left:auto; display:flex; align-items:center;">${this._getActionGlyph("1")}</span>
+                </div>`,
+            img: "",
+            cost: ""
+        });
+
+        // Flatten Exploration & Downtime
+        if (buckets.exploration.length > 0) {
+            items.exploration.push({ id: "header-exploration", isHeader: true, name: "Exploration Activities" });
+            items.exploration.push(...buckets.exploration.sort((a, b) => a.name.localeCompare(b.name)));
+        }
+        if (buckets.downtime.length > 0) {
+            items.downtime.push({ id: "header-downtime", isHeader: true, name: "Downtime Activities" });
+            items.downtime.push(...buckets.downtime.sort((a, b) => a.name.localeCompare(b.name)));
+        }
+
+        const tabLabels = {
+            encounter: "Encounter <i class='ra ra-crossed-swords' style='margin-left: 5px;'></i>",
+            exploration: "Exploration <i class='ra ra-compass' style='margin-left: 5px;'></i>",
+            downtime: "Downtime <i class='ra ra-stopwatch' style='margin-left: 5px;'></i>"
+        };
+
+        const tabTooltips = {
+            encounter: "Encounter actions are used when time is measured in rounds.",
+            exploration: "Continuous activities performed while the party travels or investigates.",
+            downtime: "Actions performed during periods of rest, lasting days or weeks."
+        };
+
+        return { title: "ACTIONS", theme: "blue", hasTabs: true, hasSubTabs: false, items, tabLabels, tabTooltips };
     }
 
     /**
@@ -119,41 +429,21 @@ class Starfinder2eAdapter extends Pf2eAdapter {
      */
     async _getSystemSubMenuData(actor, systemId, menuData) {
         if (systemId === "action") {
-            // Obtém os dados originais de ações e ataques
-            // Adiciona fallback para garantir que os objetos existam
-            const actionData = await super._getSystemSubMenuData(actor, "action", menuData) || { items: {}, tabLabels: {}, subTabLabels: {} };
-            const strikeData = await super._getSystemSubMenuData(actor, "strike", menuData) || { items: [] }; // strikeData.items é um array
+            const actionData = this._getActionData(actor);
+            const strikeData = await super._getSystemSubMenuData(actor, "strike", menuData);
 
-            // Insere os Strikes como a primeira aba do menu de Ações
-            const strikeTabKey = "strike";
-            const strikeLabel = "Strikes"; // Nome curto e direto
+            if (Array.isArray(actionData.items?.encounter)) {
+                // Injeta os Strikes logo após o cabeçalho de Ataques
+                let attackIdx = actionData.items.encounter.findIndex(i => i.isHeader && i.name.includes("Attacks"));
+                if (attackIdx === -1) attackIdx = 0;
 
-            // Garante que as propriedades de actionData sejam objetos antes de usar o spread
-            if (!actionData.items || typeof actionData.items !== 'object') {
-                actionData.items = {};
-            }
-            if (!actionData.tabLabels || typeof actionData.tabLabels !== 'object') {
-                actionData.tabLabels = {};
-            }
-            if (!actionData.subTabLabels || typeof actionData.subTabLabels !== 'object') {
-                actionData.subTabLabels = {};
+                actionData.items.encounter.splice(attackIdx + 1, 0,
+                    ...strikeData.items,
+                    { id: "separator-strikes", isHeader: false, name: "---", img: "" } // Separador
+                );
             }
 
-            // Injeta Strikes como a primeira aba do menu de ações
-            actionData.items = {
-                [strikeTabKey]: { all: strikeData.items },
-                ...actionData.items
-            };
-            actionData.tabLabels = {
-                [strikeTabKey]: strikeLabel,
-                ...actionData.tabLabels
-            };
-
-            actionData.subTabLabels = {
-                [strikeTabKey]: { all: strikeLabel },
-                ...actionData.subTabLabels
-            };
-
+            actionData.title = menuData.label;
             return actionData;
         }
         return super._getSystemSubMenuData(actor, systemId, menuData);
@@ -167,36 +457,41 @@ class Starfinder2eAdapter extends Pf2eAdapter {
         return [
             {
                 systemId: "spell",
-                label: "Spells", // Nome curto e direto
-                icon: "fas fa-wand-magic-sparkles",
+                label: "Spells <i class='ra ra-bleeding-eye' style='margin-left: 10px;'></i>",
+                icon: "",
+                img: "",
                 type: "submenu",
                 useSidebar: true,
             },
             {
                 systemId: "action",
-                label: "Actions", // Nome curto e direto
-                icon: "fas fa-crosshairs", // Ícone de mira, comum em HUDs de combate
+                label: "Actions <i class='ra ra-aware' style='margin-left: 10px;'></i>",
+                icon: "",
+                img: "",
                 type: "submenu",
                 useSidebar: true,
             },
             {
                 systemId: "feat",
-                label: "Feats", // Nome curto e direto
-                icon: "fas fa-microchip", // Representando Augmentations/Feats tecnológicos
+                label: "Feats <i class='ra ra-regeneration' style='margin-left: 10px;'></i>",
+                icon: "",
+                img: "",
                 type: "submenu",
                 useSidebar: true,
             },
             {
                 systemId: "utility",
-                label: "Utility", // Nome curto e direto
-                icon: "fas fa-gears",
+                label: "Utility <i class='ra ra-gear-hammer' style='margin-left: 10px;'></i>",
+                icon: "",
+                img: "",
                 type: "submenu",
                 useSidebar: true,
             },
             {
                 systemId: "inventory",
-                label: "Inventory", // Nome curto e direto
-                icon: "fas fa-suitcase-rolling",
+                label: "Inventory <i class='ra ra-triforce' style='margin-left: 10px;'></i>",
+                icon: "",
+                img: "",
                 type: "submenu",
                 useSidebar: true,
             },
@@ -205,23 +500,23 @@ class Starfinder2eAdapter extends Pf2eAdapter {
 
     // Regra SF2e: Stamina absorve dano antes do HP
     async updateAttribute(actor, path, input) {
-        const current = foundry.utils.getProperty(actor, path);
-        const val = (current && typeof current === "object") ? current.value : current;
-        const max = (current && typeof current === "object") ? current.max : 0;
+        const prop = foundry.utils.getProperty(actor, path);
+        const val = (typeof prop === "object") ? prop.value : prop;
+        const max = (typeof prop === "object") ? prop.max : 0;
 
         const numericInput = Number(input);
         let newValue = (input.startsWith("+") || input.startsWith("-")) ? val + numericInput : numericInput;
 
-        if (path.includes("hp") && newValue < val) {
+        if (path.endsWith(".hp") && newValue < val) {
             const damage = val - newValue;
-            const sp = actor.system.attributes.sp?.value || 0;
-            if (sp > 0) {
-                const spDamage = Math.min(damage, sp);
-                await actor.update({ "system.attributes.sp.value": Math.max(0, sp - spDamage) });
+            const stamina = actor.system.attributes.sp;
+            if (stamina?.value > 0) {
+                const spDamage = Math.min(damage, stamina.value);
+                await actor.update({ "system.attributes.sp.value": stamina.value - spDamage });
                 newValue = val - (damage - spDamage);
             }
         }
-        const updatePath = (current && typeof current === "object") ? `${path}.value` : path;
+        const updatePath = (typeof prop === "object") ? `${path}.value` : path;
         await actor.update({ [updatePath]: max > 0 ? Math.clamp(newValue, 0, max) : Math.max(0, newValue) });
     }
 
