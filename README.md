@@ -18,7 +18,11 @@
 *Interface adaptada para a complexidade tática do Starfinder 2e.*
 </div>
 
-Este módulo adapta o **Stylish Action HUD** para as necessidades específicas do **Starfinder 2nd Edition**, garantindo que a vasta lista de ações, perícias e magias do sistema caibam perfeitamente na sua tela.
+---
+
+## 🎥 Video Demonstration / Demonstração
+
+[![Starfinder 2e Stylish Action HUD Integration](https://img.youtube.com/vi/d5mqZbhOxjU/maxresdefault.jpg)](https://www.youtube.com/watch?v=d5mqZbhOxjU)
 
 ---
 
@@ -46,14 +50,14 @@ Este módulo adapta o **Stylish Action HUD** para as necessidades específicas d
 - **Foundry V13 Ready**: Built and tested for the latest Foundry VTT versions.
 
 ### 🛠️ Requirements
-- **Sistema**: [Starfinder 2nd Edition](https://foundryvtt.com/packages/sf2e)
-- **Module**: [Stylish Action HUD](https://www.patreon.com/cw/glitchsmith)
+- **System**: [Starfinder 2nd Edition](https://foundryvtt.com/packages/sf2e)
+- **Module**: [Stylish Action HUD](https://www.patreon.com/theglitchsmith)
 
 ### 🚀 Installation
 1. In Foundry VTT, go to **Add-on Modules**.
 2. Click **Install Module**.
 3. In the "Manifest URL" field, paste:
-https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/master/module.json
+   `https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/master/module.json`
 
 ---
 
@@ -66,12 +70,12 @@ https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/m
 
 ### 🛠️ Requisitos
 - **Sistema**: [Starfinder 2nd Edition](https://foundryvtt.com/packages/sf2e)
-- **Module**: [Stylish Action HUD](https://www.patreon.com/cw/glitchsmith)
+- **Módulo**: [Stylish Action HUD](https://www.patreon.com/theglitchsmith)
 
 ### 🚀 Instalação
 1. No Foundry VTT, vá em **Instalar Módulo**.
 2. No campo "Manifest URL", cole:
-https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/master/module.json
+   `https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/master/module.json`
 
 ---
 
