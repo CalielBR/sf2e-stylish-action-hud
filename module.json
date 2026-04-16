@@ -1,26 +1,29 @@
 {
-  "id": "sf2e-stylish-action-hud",
-  "title": "Starfinder2e Stylish Action Hud Integration",
-  "description": "Visual and layout optimization for the Token Action HUD in the Starfinder 2e system.",
-  "version": "1.2.0",
+  "id": "sf2e-stylish-action-hud-integration",
+  "title": "Stylish Bridge - SF2e Integration",
+  "description": "Visual and layout optimization for the Stylish Action HUD in the Starfinder 2e system.",
   "authors": [
     {
-      "name": "CalielBR"
+      "name": "CalieLBR",
+      "discord": "calielbr#7504"
+    },
+    {
+      "name": "neogenesis"
     }
   ],
-  "manifest": "https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/main/module.json",
-  "download": "https://github.com/CalielBR/sf2e-stylish-action-hud-integration/releases/download/v1.1.0/module.zip",
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/sf2-stylish-bridge.css"
+  ],
+  "version": "2.0.0",
   "compatibility": {
     "minimum": "13",
-    "verified": "13"
+    "verified": "13",
+    "maximum": "14"
   },
   "relationships": {
-    "requires": [
-      {
-        "id": "stylish-action-hud",
-        "type": "module"
-      }
-    ],
     "systems": [
       {
         "id": "sf2e",
@@ -29,12 +32,15 @@
           "minimum": "0.0.11"
         }
       }
+    ],
+    "requires": [
+      {
+        "id": "stylish-action-hud",
+        "type": "module"
+      }
     ]
   },
-  "styles": [
-    "styles/sf2e-StylishActionHud-styles.css"
-  ],
-  "esmodules": [
-    "scripts/main.js"
-  ]
+  "url": "https://github.com/CalielBR/sf2e-stylish-action-hud-integration",
+  "manifest": "https://raw.githubusercontent.com/CalielBR/sf2e-stylish-action-hud-integration/master/module.json",
+  "download": "https://github.com/CalielBR/sf2e-stylish-action-hud-integration/releases/latest/download/module.zip"
 }
