@@ -62,7 +62,7 @@ Este módulo adapta o **Stylish Action HUD** para as necessidades específicas d
 
 ### 🛠️ Requirements
 
-- **System**: [Starfinder 2nd Edition](https://foundryvtt.com/packages/sf2e) (v0.2.0+)
+- **System**: [Starfinder 2nd Edition](https://foundryvtt.com/packages/sf2e) (v0.0.11+)
 - **Module**: [Stylish Action HUD](https://foundryvtt.com/packages/stylish-action-hud)
 
 ### 🚀 Installation
