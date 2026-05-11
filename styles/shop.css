@@ -1,0 +1,196 @@
+/* ── SF2e Shop — Sci-Fi Purple Theme ────────────────────────────────────── */
+
+/* Janela Principal */
+.sf2e-shop-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-family: 'Oswald', sans-serif;
+    color: #eee;
+    background: #0f0a19; /* Fundo roxo ultra escuro */
+    border: 1px solid #782e9c;
+    box-shadow: 0 0 15px rgba(120, 46, 156, 0.4);
+}
+
+/* Cabeçalho */
+.sf2e-shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border-bottom: 2px solid #782e9c;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2em;
+}
+
+.sf2e-balance strong {
+    color: #facc15; /* Créditos em Dourado/Cyber Yellow */
+    text-shadow: 0 0 5px rgba(250, 204, 21, 0.5);
+}
+
+/* Layout Buy: Filtros e Lista */
+.sf2e-shop-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Filtros Laterais */
+.sf2e-filters {
+    width: 200px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-right: 1px solid rgba(120, 46, 156, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.9em;
+}
+
+.sf2e-filters h3 {
+    margin: 0;
+    font-family: 'Teko';
+    font-size: 1.5em;
+    color: #c084fc;
+    border-bottom: 1px solid #782e9c;
+    text-transform: uppercase;
+}
+
+.sf2e-search, .sf2e-level-range input {
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+.sf2e-search:focus {
+    border-color: #c084fc;
+    box-shadow: 0 0 5px #c084fc;
+}
+
+.sf2e-type-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 2px 0;
+    transition: color 0.2s;
+}
+
+.sf2e-type-label:hover {
+    color: #c084fc;
+}
+
+.sf2e-clear-filters {
+    margin-top: auto;
+    background: #331a4d;
+    color: #fff;
+    border: 1px solid #782e9c;
+    cursor: pointer;
+    font-family: 'Teko';
+    text-transform: uppercase;
+}
+
+/* Listagem de Itens */
+.sf2e-item-list, .sf2e-sell-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-content: start;
+}
+
+.sf2e-item-row, .sf2e-sell-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(120, 46, 156, 0.2);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.sf2e-item-row:hover, .sf2e-sell-row:hover {
+    background: rgba(120, 46, 156, 0.1);
+    border-color: #c084fc;
+    transform: translateY(-1px);
+}
+
+/* Cores de Raridade */
+.sf2e-rarity-uncommon { color: #5e9cff; }
+.sf2e-rarity-rare { color: #f9f871; }
+.sf2e-rarity-unique { color: #ff6f91; }
+
+.sf2e-item-img {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.sf2e-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sf2e-item-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sf2e-item-meta {
+    font-size: 0.8em;
+    color: #aaa;
+}
+
+/* Preços e Botões */
+.sf2e-item-price, .sf2e-sell-price {
+    font-family: 'Teko';
+    font-size: 1.4em;
+    color: #facc15;
+    text-align: right;
+}
+
+.sf2e-buy-btn, .sf2e-sell-btn {
+    background: #782e9c;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 12px;
+    font-family: 'Teko';
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(120, 46, 156, 0.5);
+}
+
+.sf2e-buy-btn:hover { background: #9d39cc; }
+.sf2e-sell-btn { background: #166534; }
+.sf2e-sell-btn:hover { background: #22c55e; }
+
+/* Paginação */
+.sf2e-pagination {
+    padding: 10px;
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid #782e9c;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ── SF2e Shop Chat Card (Seção 12 do MD) ────────────────────────────────── */
+.sf2e-shop-chat {
+    font-family: 'Teko', sans-serif;
+    font-size: 1.3em;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: rgba(15, 10, 25, 0.9);
+    border: 1px solid #782e9c;
+    color: #eee;
+}
